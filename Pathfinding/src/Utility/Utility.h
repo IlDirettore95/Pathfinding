@@ -19,7 +19,7 @@ namespace Utility
 
 	Grid::Point GetIndexesFromDirection(Grid::Point start, Direction2D direction);
 
-	Graph* GridToGraph(Grid* grid);
+	std::shared_ptr<Graph> GridToGraph(Grid* grid);
 
-	void PrintPath(Grid* grid, Graph* graph, std::vector<Graph::Connection>* path);
+	void PrintPath(Grid* grid, std::shared_ptr<Graph> graph, std::vector<Graph::Connection>* path);
 }

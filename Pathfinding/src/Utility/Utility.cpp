@@ -1,5 +1,6 @@
 ﻿#include "Utility.h"
 #include "..\Tools\Profiling.h"
+#include <memory>
 
 namespace Utility
 {
@@ -43,12 +44,13 @@ namespace Utility
 		return Grid::Point(start.I + offsetRow, start.J + offsetColumn);
 	}
 
-	Graph* GridToGraph(Grid* grid)
+	std::shared_ptr<Graph> GridToGraph(Grid* grid)
 	{
 		START_PROFILE("BUILD_GRAPH");
 	
-		Graph* graph = new Graph;
+		//Graph* graph = new Graph;
 
+		std::shared_ptr<Graph> graph = std::make_shared<Graph>();
 
 		const int height = grid->HEIGHT;
 		const int width = grid->WIDTH;
@@ -261,7 +263,7 @@ namespace Utility
 		return false;
 	}
 
-	void PrintPath(Grid* grid, Graph* graph, std::vector<Graph::Connection>* path)
+	void PrintPath(Grid* grid, std::shared_ptr<Graph> graph, std::vector<Graph::Connection>* path)
 	{
 		int height = grid->HEIGHT;
 		int width = grid->WIDTH;

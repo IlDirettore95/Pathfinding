@@ -2,6 +2,7 @@
 #include "AStar.h"
 #include "..\Tools\Profiling.h"
 #include "..\Tools\Logger.h"
+#include <memory>
 
 namespace AStar
 {
@@ -140,13 +141,25 @@ namespace AStar
 
 	std::vector<Graph::Connection>* AStar(Graph& graph, Graph::Node start, Graph::Node end)
 	{
+		std::unique_ptr<NodeRecord[]> NodeRecordArray = std::make_unique<NodeRecord[]>(graph.GetNodes()->size());
+		for (int i = 0; i < graph.GetNodes()->size(); i++)
+		{
+			NodeRecordArray[i].Node = graph.GetNodes()->at(i);
+			NodeRecordArray[i].Connection = Graph::Connection(NULL_CONNECTION(Graph::Node(NULL_NODE)));
+			NodeRecordArray[i].ParentNode = nullptr;
+			NodeRecordArray[i].CostSoFar = 0;
+			NodeRecordArray[i].EstimatedTotalCost = INFINITY;
+			NodeRecordArray[i].State = NodeRecord::State::UNVISITED;
+		}
+
 		START_PROFILE("A_STAR");
 
-		NodeRecord* startRecord = new NodeRecord(start, Graph::Connection(NULL_CONNECTION(start)), nullptr, 0, Estimate(start, end));
-
+		//NodeRecord* startRecord = new NodeRecord(start, Graph::Connection(NULL_CONNECTION(start)), nullptr, 0, Estimate(start, end));
+		NodeRecord* startRecord = &NodeRecordArray[start.ID];
+		startRecord->State = NodeRecord::State::OPEN;
 		std::vector<NodeRecord*> open;
 		Add(open, startRecord);
-		std::vector<NodeRecord*> closed;
+		//std::vector<NodeRecord*> closed;
 
 		NodeRecord* current = startRecord;
 
@@ -163,46 +176,68 @@ namespace AStar
 			{
 				Graph::Node& endNode = connection.To;
 				float endNodeCost = current->CostSoFar + connection.Cost;
-				float endNodeHeuristic;
+				float endNodeHeuristic = INFINITY;
 
-				NodeRecord* endNodeRecord = nullptr;
-				NodeRecord** ptr_endNodeRecord = &endNodeRecord;
-				int endNodeIndex = -1;
+				//NodeRecord* endNodeRecord = nullptr;
+				NodeRecord* endNodeRecord = &NodeRecordArray[endNode.ID];
+				//NodeRecord** ptr_endNodeRecord = &endNodeRecord;
+				//int endNodeIndex = -1;
 
-				if (ContainsClosed(closed, endNode, ptr_endNodeRecord, &endNodeIndex))
+				switch (endNodeRecord->State)
 				{
-					if (endNodeRecord->CostSoFar <= endNodeCost)
-						continue;
-
-					Erase(closed, endNodeIndex);
-					
-					endNodeHeuristic = endNodeRecord->EstimatedTotalCost - endNodeRecord->CostSoFar;
-				}
-				else if (ContainsOpen(open, endNode, ptr_endNodeRecord, &endNodeIndex))
-				{
+				case NodeRecord::State::CLOSED:
+				case NodeRecord::State::OPEN:
 					if (endNodeRecord->CostSoFar <= endNodeCost)
 						continue;
 
 					endNodeHeuristic = endNodeRecord->EstimatedTotalCost - endNodeRecord->CostSoFar;
-				}
-				else
-				{
-					endNodeRecord = new NodeRecord;
-					endNodeRecord->Node = endNode;
+					break;
+				case NodeRecord::State::UNVISITED:
 					endNodeHeuristic = Estimate(endNode, end);
+					break;
 				}
+				
+				
+				
+				//if (ContainsClosed(closed, endNode, ptr_endNodeRecord, &endNodeIndex))
+				//{
+				//	if (endNodeRecord->CostSoFar <= endNodeCost)
+				//		continue;
+
+				//	Erase(closed, endNodeIndex);
+				//	
+				//	endNodeHeuristic = endNodeRecord->EstimatedTotalCost - endNodeRecord->CostSoFar;
+				//}
+				//else if (ContainsOpen(open, endNode, ptr_endNodeRecord, &endNodeIndex))
+				//{
+				//	if (endNodeRecord->CostSoFar <= endNodeCost)
+				//		continue;
+
+				//	endNodeHeuristic = endNodeRecord->EstimatedTotalCost - endNodeRecord->CostSoFar;
+				//}
+				//else
+				//{
+				//	endNodeRecord = new NodeRecord;
+				//	endNodeRecord->Node = endNode;
+				//	endNodeHeuristic = Estimate(endNode, end);
+				//}
 
 				endNodeRecord->Connection = connection;
 				endNodeRecord->ParentNode = current;
 				endNodeRecord->CostSoFar = endNodeCost;
 				endNodeRecord->EstimatedTotalCost = endNodeCost + endNodeHeuristic;
-
-				if (!Contains(open, endNode))
+				if (endNodeRecord->State != NodeRecord::State::OPEN)
+				{
+					endNodeRecord->State = NodeRecord::State::OPEN;
 					Add(open, endNodeRecord);
+				}
+				//if (!Contains(open, endNode))
+				//	Add(open, endNodeRecord);
 			}
 
 			Erase(open, current);
-			Add(closed, current);
+			//Add(closed, current);
+			current->State = NodeRecord::State::CLOSED;
 		}
 
 		if (current->Node.ID != end.ID)
@@ -220,8 +255,8 @@ namespace AStar
 
 		Reverse(*path);
 
-		DEBUG("A_STAR (Fill %): ");
-		DEBUG((open.size() + closed.size()) / (float)graph.GetNodes()->size());
+		//DEBUG("A_STAR (Fill %): ");
+		//DEBUG((open.size() + closed.size()) / (float)graph.GetNodes()->size());
 
 
 		return path;

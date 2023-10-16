@@ -6,12 +6,19 @@ namespace AStar
 {
 	struct NodeRecord
 	{
+		enum State
+		{
+			OPEN,
+			CLOSED,
+			UNVISITED,
+		};
+
 		Graph::Node Node;
 		Graph::Connection Connection;
 		NodeRecord* ParentNode;
 		float CostSoFar;
 		float EstimatedTotalCost;
-
+		State State;
 		NodeRecord();
 
 		NodeRecord(Graph::Node node, Graph::Connection connection, NodeRecord* parentNode, float costSoFar, float estimatedTotalCost);

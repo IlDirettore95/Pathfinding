@@ -1,3 +1,3 @@
 #pragma once
 
-#define VERSION "Simple A_Star"
+#define VERSION "NodeArray A_Star"
