@@ -7,10 +7,7 @@
 namespace AStar
 {
 	NodeRecord::NodeRecord()
-		: Node(NULL_NODE), Connection(NULL_CONNECTION(Graph::Node(NULL_NODE))), ParentNode(nullptr), CostSoFar(INFINITY), EstimatedTotalCost(INFINITY) {}
-
-	NodeRecord::NodeRecord(Graph::Node node, Graph::Connection connection, NodeRecord* parentNode, float costSoFar, float estimatedTotalCost)
-		: Node(node), Connection(connection), ParentNode(parentNode), CostSoFar(costSoFar), EstimatedTotalCost(estimatedTotalCost) {}
+		: Node(NULL_NODE), Connection(NULL_CONNECTION(Graph::Node(NULL_NODE))), ParentNode(nullptr), CostSoFar(INFINITY), EstimatedTotalCost(INFINITY), State(NodeRecord::State::UNVISITED) {}
 
 	float Estimate(Graph::Node current, Graph::Node end)
 	{
@@ -54,29 +51,6 @@ namespace AStar
 		END_ACC_PROFILE
 	}
 
-	void Add(std::vector<NodeRecord*>& list, NodeRecord* node)
-	{
-		START_ACC_PROFILE("AddNode");
-		list.push_back(node);
-		END_ACC_PROFILE
-	}
-
-	void Erase(std::vector<NodeRecord*>& list, NodeRecord* current)
-	{
-		START_ACC_PROFILE("EraseNode");
-		
-		for (int i = 0; i < list.size(); i++)
-		{
-			if (list[i]->Node.ID == current->Node.ID)
-			{
-				list.erase(list.begin() + i);
-				break;
-			}
-		}
-
-		END_ACC_PROFILE
-	}
-
 	std::vector<Graph::Connection>* AStar(Graph& graph, Graph::Node start, Graph::Node end)
 	{
 		std::unique_ptr<NodeRecord[]> NodeRecordArray = std::make_unique<NodeRecord[]>(graph.GetNodes()->size());
@@ -94,14 +68,23 @@ namespace AStar
 
 		NodeRecord* startRecord = &NodeRecordArray[start.ID];
 		startRecord->State = NodeRecord::State::OPEN;
-		std::vector<NodeRecord*> open;
-		Add(open, startRecord);
+		startRecord->EstimatedTotalCost = Estimate(start, end);
+		auto cmp = [] (NodeRecord* left, NodeRecord* right) { return (left->EstimatedTotalCost) > (right->EstimatedTotalCost); };
+		std::priority_queue<NodeRecord*, std::vector<NodeRecord*>, decltype(cmp)> open(cmp);
 
 		NodeRecord* current = startRecord;
+		
+		//START_ACC_PROFILE("ADD QUEUE");
+		open.push(current);
+		//END_ACC_PROFILE
 
 		while (open.size() > 0)
 		{
-			FindSmallestElement(open, &current);
+			current = open.top();
+			
+			//START_ACC_PROFILE("POP QUEUE");
+			open.pop();
+			//END_ACC_PROFILE
 
 			if (current->Node.ID == end.ID)
 				break;
@@ -136,11 +119,12 @@ namespace AStar
 				if (endNodeRecord->State != NodeRecord::State::OPEN)
 				{
 					endNodeRecord->State = NodeRecord::State::OPEN;
-					Add(open, endNodeRecord);
+					
+					//START_ACC_PROFILE("ADD QUEUE");
+					open.push(endNodeRecord);
+					//END_ACC_PROFILE
 				}
 			}
-
-			Erase(open, current);
 			current->State = NodeRecord::State::CLOSED;
 		}
 

@@ -1,3 +1,3 @@
 #pragma once
 
-#define VERSION "NodeArray A_Star"
+#define VERSION "PriorityQueue NodeArray A_Star"
