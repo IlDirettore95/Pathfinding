@@ -61,15 +61,6 @@ namespace AStar
 		END_ACC_PROFILE
 	}
 
-	void Erase(std::vector<NodeRecord*>& list, int index)
-	{
-		START_ACC_PROFILE("EraseNode");
-
-		list.erase(list.begin() + index);
-
-		END_ACC_PROFILE
-	}
-
 	void Erase(std::vector<NodeRecord*>& list, NodeRecord* current)
 	{
 		START_ACC_PROFILE("EraseNode");
@@ -82,59 +73,6 @@ namespace AStar
 				break;
 			}
 		}
-
-		END_ACC_PROFILE
-	}
-
-	bool Contains(std::vector<NodeRecord*>& list, Graph::Node& node)
-	{
-		START_ACC_PROFILE("ContainsNodeOpen");
-
-		for (int i = 0; i < list.size(); i++)
-		{
-			if (list[i]->Node.ID == node.ID)
-			{
-				return true;
-			}
-		}
-
-		return false;
-
-		END_ACC_PROFILE
-	}
-
-	bool ContainsClosed(std::vector<NodeRecord*>& list, Graph::Node& node, NodeRecord** nodeRecord, int* nodeIndex)
-	{
-		START_ACC_PROFILE("ContainsNodeClosed");
-
-		for (int i = 0; i < list.size(); i++)
-		{
-			if (list[i]->Node.ID == node.ID)
-			{
-				*nodeRecord = list[i];
-				*nodeIndex = i;
-				return true;
-			}
-		}
-		return false;
-		
-		END_ACC_PROFILE
-	}
-
-	bool ContainsOpen(std::vector<NodeRecord*>& list, Graph::Node& node, NodeRecord** nodeRecord, int* nodeIndex)
-	{
-		START_ACC_PROFILE("ContainsNodeOpen");
-
-		for (int i = 0; i < list.size(); i++)
-		{
-			if (list[i]->Node.ID == node.ID)
-			{
-				*nodeRecord = list[i];
-				*nodeIndex = i;
-				return true;
-			}
-		}
-		return false;
 
 		END_ACC_PROFILE
 	}
@@ -154,12 +92,10 @@ namespace AStar
 
 		START_PROFILE("A_STAR");
 
-		//NodeRecord* startRecord = new NodeRecord(start, Graph::Connection(NULL_CONNECTION(start)), nullptr, 0, Estimate(start, end));
 		NodeRecord* startRecord = &NodeRecordArray[start.ID];
 		startRecord->State = NodeRecord::State::OPEN;
 		std::vector<NodeRecord*> open;
 		Add(open, startRecord);
-		//std::vector<NodeRecord*> closed;
 
 		NodeRecord* current = startRecord;
 
@@ -178,10 +114,7 @@ namespace AStar
 				float endNodeCost = current->CostSoFar + connection.Cost;
 				float endNodeHeuristic = INFINITY;
 
-				//NodeRecord* endNodeRecord = nullptr;
 				NodeRecord* endNodeRecord = &NodeRecordArray[endNode.ID];
-				//NodeRecord** ptr_endNodeRecord = &endNodeRecord;
-				//int endNodeIndex = -1;
 
 				switch (endNodeRecord->State)
 				{
@@ -196,32 +129,6 @@ namespace AStar
 					endNodeHeuristic = Estimate(endNode, end);
 					break;
 				}
-				
-				
-				
-				//if (ContainsClosed(closed, endNode, ptr_endNodeRecord, &endNodeIndex))
-				//{
-				//	if (endNodeRecord->CostSoFar <= endNodeCost)
-				//		continue;
-
-				//	Erase(closed, endNodeIndex);
-				//	
-				//	endNodeHeuristic = endNodeRecord->EstimatedTotalCost - endNodeRecord->CostSoFar;
-				//}
-				//else if (ContainsOpen(open, endNode, ptr_endNodeRecord, &endNodeIndex))
-				//{
-				//	if (endNodeRecord->CostSoFar <= endNodeCost)
-				//		continue;
-
-				//	endNodeHeuristic = endNodeRecord->EstimatedTotalCost - endNodeRecord->CostSoFar;
-				//}
-				//else
-				//{
-				//	endNodeRecord = new NodeRecord;
-				//	endNodeRecord->Node = endNode;
-				//	endNodeHeuristic = Estimate(endNode, end);
-				//}
-
 				endNodeRecord->Connection = connection;
 				endNodeRecord->ParentNode = current;
 				endNodeRecord->CostSoFar = endNodeCost;
@@ -231,12 +138,9 @@ namespace AStar
 					endNodeRecord->State = NodeRecord::State::OPEN;
 					Add(open, endNodeRecord);
 				}
-				//if (!Contains(open, endNode))
-				//	Add(open, endNodeRecord);
 			}
 
 			Erase(open, current);
-			//Add(closed, current);
 			current->State = NodeRecord::State::CLOSED;
 		}
 
@@ -251,14 +155,10 @@ namespace AStar
 			current = current->ParentNode;
 		}
 		
-		//delete current;
-
 		Reverse(*path);
 
 		//DEBUG("A_STAR (Fill %): ");
 		//DEBUG((open.size() + closed.size()) / (float)graph.GetNodes()->size());
-
-
 		return path;
 		END_PROFILE
 	}
