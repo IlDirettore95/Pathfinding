@@ -13,66 +13,50 @@ namespace AStar
 
 	float Estimate(Graph::Node current, Graph::Node end)
 	{
-		START_ACC_PROFILE("EuclideanDistance")
+		START_PROFILE();
 		return (float)std::sqrt(std::pow(current.Position.X - end.Position.X, 2) + std::pow(current.Position.Y - end.Position.Y, 2));
-		END_ACC_PROFILE
 	}
 
 	void FindSmallestElement(std::vector<NodeRecord*>& list, NodeRecord** smallest)
 	{
-		START_ACC_PROFILE("FindSmallestElement");
-
+		START_PROFILE();
 		*smallest = list[0];
 
 		for (int i = 1; i < list.size(); i++)
 		{
 			*smallest = list[i]->EstimatedTotalCost < (*smallest)->EstimatedTotalCost ? list[i] : *smallest;
 		}
-
-		END_ACC_PROFILE
 	}
 
 	void Reverse(std::vector<Graph::Connection>& list)
 	{
-		START_ACC_PROFILE("Reverse");
-
 		for (int i = 0; i < list.size() / 2; i++)
 		{
 			Graph::Connection temp = list[i];
 			list[i] = list[list.size() - 1 - i];
 			list[list.size() - 1 - i] = temp;
 		}
-
-		END_ACC_PROFILE
 	}
 
 	void Add(std::vector<Graph::Connection>& list, Graph::Connection connection)
 	{
-		START_ACC_PROFILE("AddNode");
 		list.push_back(connection);
-		END_ACC_PROFILE
 	}
 
 	void Add(std::vector<NodeRecord*>& list, NodeRecord* node)
 	{
-		START_ACC_PROFILE("AddNode");
 		list.push_back(node);
-		END_ACC_PROFILE
 	}
 
 	void Erase(std::vector<NodeRecord*>& list, int index)
 	{
-		START_ACC_PROFILE("EraseNode");
-
+		START_PROFILE();
 		list.erase(list.begin() + index);
-
-		END_ACC_PROFILE
 	}
 
 	void Erase(std::vector<NodeRecord*>& list, NodeRecord* current)
-	{
-		START_ACC_PROFILE("EraseNode");
-		
+	{		
+		START_PROFILE();
 		for (int i = 0; i < list.size(); i++)
 		{
 			if (list[i]->Node.ID == current->Node.ID)
@@ -81,14 +65,11 @@ namespace AStar
 				break;
 			}
 		}
-
-		END_ACC_PROFILE
 	}
 
 	bool Contains(std::vector<NodeRecord*>& list, Graph::Node& node)
 	{
-		START_ACC_PROFILE("ContainsNodeOpen");
-
+		START_PROFILE();
 		for (int i = 0; i < list.size(); i++)
 		{
 			if (list[i]->Node.ID == node.ID)
@@ -98,14 +79,11 @@ namespace AStar
 		}
 
 		return false;
-
-		END_ACC_PROFILE
 	}
 
 	bool ContainsClosed(std::vector<NodeRecord*>& list, Graph::Node& node, NodeRecord** nodeRecord, int* nodeIndex)
 	{
-		START_ACC_PROFILE("ContainsNodeClosed");
-
+		START_PROFILE();
 		for (int i = 0; i < list.size(); i++)
 		{
 			if (list[i]->Node.ID == node.ID)
@@ -116,14 +94,11 @@ namespace AStar
 			}
 		}
 		return false;
-		
-		END_ACC_PROFILE
 	}
 
 	bool ContainsOpen(std::vector<NodeRecord*>& list, Graph::Node& node, NodeRecord** nodeRecord, int* nodeIndex)
 	{
-		START_ACC_PROFILE("ContainsNodeOpen");
-
+		START_PROFILE();
 		for (int i = 0; i < list.size(); i++)
 		{
 			if (list[i]->Node.ID == node.ID)
@@ -134,14 +109,11 @@ namespace AStar
 			}
 		}
 		return false;
-
-		END_ACC_PROFILE
 	}
 
 	std::vector<Graph::Connection>* AStar(Graph& graph, Graph::Node start, Graph::Node end)
 	{
-		START_PROFILE("A_STAR");
-
+		START_PROFILE();
 		NodeRecord* startRecord = new NodeRecord(start, Graph::Connection(NULL_CONNECTION(start)), nullptr, 0, Estimate(start, end));
 
 		std::vector<NodeRecord*> open;
@@ -215,8 +187,6 @@ namespace AStar
 			Add(*path, current->Connection);
 			current = current->ParentNode;
 		}
-		
-		//delete current;
 
 		Reverse(*path);
 
@@ -225,7 +195,6 @@ namespace AStar
 
 
 		return path;
-		END_PROFILE
 	}
 
 	void PrintPath(std::vector<Graph::Connection>* path)

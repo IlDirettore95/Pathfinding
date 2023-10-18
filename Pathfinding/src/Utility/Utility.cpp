@@ -44,9 +44,8 @@ namespace Utility
 	}
 
 	Graph* GridToGraph(Grid* grid)
-	{
-		START_PROFILE("BUILD_GRAPH");
-	
+	{	
+		START_PROFILE();
 		Graph* graph = new Graph;
 
 
@@ -245,7 +244,6 @@ namespace Utility
 			}
 		}
 		return graph;
-		END_PROFILE
 	}
 
 	bool Contains(std::vector<Graph::Connection>* list, int nodeID)
@@ -263,6 +261,8 @@ namespace Utility
 
 	void PrintPath(Grid* grid, Graph* graph, std::vector<Graph::Connection>* path)
 	{
+		START_PROFILE();
+
 		int height = grid->HEIGHT;
 		int width = grid->WIDTH;
 
