@@ -2,7 +2,7 @@
 #include <memory>
 #include <unordered_map>
 
-#if defined GMDG_PROFILE
+#ifdef GMDG_PROFILE
 
 namespace Profiling
 {

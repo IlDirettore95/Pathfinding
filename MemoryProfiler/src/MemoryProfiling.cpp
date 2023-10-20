@@ -7,7 +7,7 @@
 #include <string>
 #include <sstream>
 
-#if defined GMDG_MEM_PROFILE || GMDG_DEBUG
+#if defined GMDG_MEM_PROFILE || defined GMDG_DEBUG
 
 namespace MemoryProfiling
 {

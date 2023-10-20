@@ -1,5 +1,8 @@
 #pragma once
 
+// Profiling
+#include "Core.h"
+
 //DataStructures
 #include "DataStructures\Grid.h"
 #include "DataStructures\Graph.h"
@@ -9,8 +12,6 @@
 
 //Tools
 #include "Tools\Logger.h"
-#include "Tools\Profiling.h"
-#include "Tools\MemoryProfiling.h"
 
 //Utility
 #include "Utility\Utility.h"

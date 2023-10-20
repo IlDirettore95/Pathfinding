@@ -1,7 +1,6 @@
 #include <cmath>
 #include "AStar.h"
-#include "..\Tools\Profiling.h"
-#include "..\Tools\MemoryProfiling.h"
+#include "..\Core.h"
 #include "..\Tools\Logger.h"
 #include <memory>
 

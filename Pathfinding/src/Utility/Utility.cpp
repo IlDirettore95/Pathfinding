@@ -1,6 +1,5 @@
 ﻿#include "Utility.h"
-#include "..\Tools\Profiling.h"
-#include "..\Tools\MemoryProfiling.h"
+#include "..\Core.h"
 #include <memory>
 
 namespace Utility

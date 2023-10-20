@@ -1,7 +1,6 @@
 #include <iostream>
 #include "Grid.h"
-#include "..\Tools\MemoryProfiling.h"
-#include "..\Tools\Profiling.h"
+#include "..\Core.h"
 
 Grid::Grid(const int height, const int width)
 	: m_grid(nullptr), HEIGHT(height), WIDTH(width)
