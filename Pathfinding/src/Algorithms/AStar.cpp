@@ -1,6 +1,7 @@
 #include <cmath>
 #include "AStar.h"
 #include "..\Tools\Profiling.h"
+#include "..\Tools\MemoryProfiling.h"
 #include "..\Tools\Logger.h"
 #include <memory>
 
@@ -11,44 +12,24 @@ namespace AStar
 
 	float Estimate(Graph::Node current, Graph::Node end)
 	{
-		START_ACC_PROFILE("EuclideanDistance")
+		PROFILE();
+		PROFILE_MEMORY();
 		return (float)std::sqrt(std::pow(current.Position.X - end.Position.X, 2) + std::pow(current.Position.Y - end.Position.Y, 2));
-		END_ACC_PROFILE
-	}
-
-	void FindSmallestElement(std::vector<NodeRecord*>& list, NodeRecord** smallest)
-	{
-		START_ACC_PROFILE("FindSmallestElement");
-
-		*smallest = list[0];
-
-		for (int i = 1; i < list.size(); i++)
-		{
-			*smallest = list[i]->EstimatedTotalCost < (*smallest)->EstimatedTotalCost ? list[i] : *smallest;
-		}
-
-		END_ACC_PROFILE
 	}
 
 	void Reverse(std::vector<Graph::Connection>& list)
 	{
-		START_ACC_PROFILE("Reverse");
-
 		for (int i = 0; i < list.size() / 2; i++)
 		{
 			Graph::Connection temp = list[i];
 			list[i] = list[list.size() - 1 - i];
 			list[list.size() - 1 - i] = temp;
 		}
-
-		END_ACC_PROFILE
 	}
 
 	void Add(std::vector<Graph::Connection>& list, Graph::Connection connection)
 	{
-		START_ACC_PROFILE("AddNode");
 		list.push_back(connection);
-		END_ACC_PROFILE
 	}
 
 	std::vector<Graph::Connection>* AStar(Graph& graph, Graph::Node start, Graph::Node end)
@@ -64,7 +45,8 @@ namespace AStar
 			NodeRecordArray[i].State = NodeRecord::State::UNVISITED;
 		}
 
-		START_PROFILE("A_STAR");
+		PROFILE();
+		PROFILE_MEMORY();
 
 		NodeRecord* startRecord = &NodeRecordArray[start.ID];
 		startRecord->State = NodeRecord::State::OPEN;
@@ -74,17 +56,12 @@ namespace AStar
 
 		NodeRecord* current = startRecord;
 		
-		//START_ACC_PROFILE("ADD QUEUE");
 		open.push(current);
-		//END_ACC_PROFILE
 
 		while (open.size() > 0)
 		{
 			current = open.top();
-			
-			//START_ACC_PROFILE("POP QUEUE");
 			open.pop();
-			//END_ACC_PROFILE
 
 			if (current->Node.ID == end.ID)
 				break;
@@ -119,10 +96,7 @@ namespace AStar
 				if (endNodeRecord->State != NodeRecord::State::OPEN)
 				{
 					endNodeRecord->State = NodeRecord::State::OPEN;
-					
-					//START_ACC_PROFILE("ADD QUEUE");
 					open.push(endNodeRecord);
-					//END_ACC_PROFILE
 				}
 			}
 			current->State = NodeRecord::State::CLOSED;
@@ -144,7 +118,6 @@ namespace AStar
 		//DEBUG("A_STAR (Fill %): ");
 		//DEBUG((open.size() + closed.size()) / (float)graph.GetNodes()->size());
 		return path;
-		END_PROFILE
 	}
 
 	void PrintPath(std::vector<Graph::Connection>* path)

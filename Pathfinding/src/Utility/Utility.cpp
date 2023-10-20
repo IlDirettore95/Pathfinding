@@ -1,5 +1,6 @@
 ﻿#include "Utility.h"
 #include "..\Tools\Profiling.h"
+#include "..\Tools\MemoryProfiling.h"
 #include <memory>
 
 namespace Utility
@@ -46,10 +47,9 @@ namespace Utility
 
 	std::shared_ptr<Graph> GridToGraph(Grid* grid)
 	{
-		START_PROFILE("BUILD_GRAPH");
+		PROFILE();
+		PROFILE_MEMORY();
 	
-		//Graph* graph = new Graph;
-
 		std::shared_ptr<Graph> graph = std::make_shared<Graph>();
 
 		const int height = grid->HEIGHT;
@@ -247,7 +247,6 @@ namespace Utility
 			}
 		}
 		return graph;
-		END_PROFILE
 	}
 
 	bool Contains(std::vector<Graph::Connection>* list, int nodeID)
