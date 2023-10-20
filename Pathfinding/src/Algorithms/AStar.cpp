@@ -7,7 +7,7 @@
 namespace AStar
 {
 	NodeRecord::NodeRecord()
-		: Node(NULL_NODE), Connection(NULL_CONNECTION(Graph::Node(NULL_NODE))), ParentNode(nullptr), CostSoFar(INFINITY), EstimatedTotalCost(INFINITY), State(NodeRecord::State::UNVISITED) {}
+		: Node(NULL_NODE), Connection(NULL_CONNECTION), ParentNode(nullptr), CostSoFar(INFINITY), EstimatedTotalCost(INFINITY), State(NodeRecord::State::UNVISITED) {}
 
 	float Estimate(Graph::Node current, Graph::Node end)
 	{
@@ -40,7 +40,7 @@ namespace AStar
 		for (int i = 0; i < graph->GetNodes()->size(); i++)
 		{
 			NodeRecordArray[i].Node = graph->GetNodes()->at(i);
-			NodeRecordArray[i].Connection = Graph::Connection(NULL_CONNECTION(Graph::Node(NULL_NODE)));
+			NodeRecordArray[i].Connection = Graph::Connection(NULL_CONNECTION);
 			NodeRecordArray[i].ParentNode = nullptr;
 			NodeRecordArray[i].CostSoFar = 0;
 			NodeRecordArray[i].EstimatedTotalCost = INFINITY;
@@ -70,7 +70,7 @@ namespace AStar
 
 			for (Graph::Connection connection : *connections)
 			{
-				Graph::Node& endNode = connection.To;
+				Graph::Node& endNode = graph->GetNodes()->at(connection.To);
 				float endNodeCost = current->CostSoFar + connection.Cost;
 				float endNodeHeuristic = INFINITY;
 
@@ -127,7 +127,7 @@ namespace AStar
 		for (int i = 0; i < path->size(); i++)
 		{
 			Graph::Connection c = (*path)[i];
-			std::cout << "\t{" << c.From.ID << ", " << c.To.ID << "}" << std::endl;
+			std::cout << "\t{" << c.From << ", " << c.To << "}" << std::endl;
 		}
 	}
 }

@@ -76,9 +76,7 @@ namespace Utility
 
 					if (!grid->IsPassable(next)) continue;
 
-					Graph::Node from(Graph::Node(i * width + j, Graph::Node::Point(j, i)));
-					Graph::Node to(Graph::Node(next.I * width + next.J, Graph::Node::Point(next.J, next.I)));
-					Graph::Connection connection(from, to, 1);
+					Graph::Connection connection(i * width + j, next.I * width + next.J, 1);
 
 					graph->AddConnection(connection);
 				}
@@ -106,9 +104,7 @@ namespace Utility
 
 				if (!grid->IsPassable(next)) continue;
 
-				Graph::Node from(Graph::Node(0 * width + j, Graph::Node::Point(j, 0)));
-				Graph::Node to(Graph::Node(next.I * width + next.J, Graph::Node::Point(next.J, next.I)));
-				Graph::Connection connection(from, to, 1);
+				Graph::Connection connection(0 * width + j, next.I * width + next.J, 1);
 
 				graph->AddConnection(connection);
 			}
@@ -126,9 +122,7 @@ namespace Utility
 
 				if (!grid->IsPassable(next)) continue;
 
-				Graph::Node from(Graph::Node((height - 1) * width + j, Graph::Node::Point(j, height - 1)));
-				Graph::Node to(Graph::Node(next.I * width + next.J, Graph::Node::Point(next.J, next.I)));
-				Graph::Connection connection(from, to, 1);
+				Graph::Connection connection((height - 1) * width + j, next.I * width + next.J, 1);
 
 				graph->AddConnection(connection);
 			}
@@ -146,9 +140,7 @@ namespace Utility
 
 				if (!grid->IsPassable(next)) continue;
 
-				Graph::Node from(Graph::Node(i * width, Graph::Node::Point(0, i)));
-				Graph::Node to(Graph::Node(next.I * width + next.J, Graph::Node::Point(next.J, next.I)));
-				Graph::Connection connection(from, to, 1);
+				Graph::Connection connection(i * width, next.I * width + next.J, 1);
 
 				graph->AddConnection(connection);
 			}
@@ -166,9 +158,7 @@ namespace Utility
 
 				if (!grid->IsPassable(next)) continue;
 
-				Graph::Node from(Graph::Node(i * width + width - 1, Graph::Node::Point(width - 1, i)));
-				Graph::Node to(Graph::Node(next.I * width + next.J, Graph::Node::Point(next.J, next.I)));
-				Graph::Connection connection(from, to, 1);
+				Graph::Connection connection(i* width + width - 1, next.I* width + next.J, 1);
 
 				graph->AddConnection(connection);
 			}
@@ -184,9 +174,7 @@ namespace Utility
 
 				if (!grid->IsPassable(next)) continue;
 
-				Graph::Node from(Graph::Node(0, Graph::Node::Point(0, 0)));
-				Graph::Node to(Graph::Node(next.I * width + next.J, Graph::Node::Point(next.J, next.I)));
-				Graph::Connection connection(from, to, 1);
+				Graph::Connection connection(0, next.I* width + next.J, 1);
 
 				graph->AddConnection(connection);
 			}
@@ -202,9 +190,7 @@ namespace Utility
 
 				if (!grid->IsPassable(next)) continue;
 
-				Graph::Node from(Graph::Node(width - 1, Graph::Node::Point(width - 1, 0)));
-				Graph::Node to(Graph::Node(next.I * width + next.J, Graph::Node::Point(next.J, next.I)));
-				Graph::Connection connection(from, to, 1);
+				Graph::Connection connection(width - 1, next.I * width + next.J, 1);
 
 				graph->AddConnection(connection);
 			}
@@ -220,9 +206,7 @@ namespace Utility
 
 				if (!grid->IsPassable(next)) continue;
 
-				Graph::Node from(Graph::Node((height - 1) * width, Graph::Node::Point(0, height - 1)));
-				Graph::Node to(Graph::Node(next.I * width + next.J, Graph::Node::Point(next.J, next.I)));
-				Graph::Connection connection(from, to, 1);
+				Graph::Connection connection((height - 1)* width, next.I* width + next.J, 1);
 
 				graph->AddConnection(connection);
 			}
@@ -238,9 +222,7 @@ namespace Utility
 
 				if (!grid->IsPassable(next)) continue;
 
-				Graph::Node from(Graph::Node((height - 1) * width + width - 1, Graph::Node::Point(width - 1, height - 1)));
-				Graph::Node to(Graph::Node(next.I * width + next.J, Graph::Node::Point(next.J, next.I)));
-				Graph::Connection connection(from, to, 1);
+				Graph::Connection connection((height - 1)* width + width - 1, next.I* width + next.J, 1);
 
 				graph->AddConnection(connection);
 			}
@@ -252,7 +234,7 @@ namespace Utility
 	{
 		for (int i = 0; i < list->size(); i++)
 		{
-			if ((*list)[i].From.ID == nodeID || (*list)[i].To.ID == nodeID)
+			if ((*list)[i].From == nodeID || (*list)[i].To == nodeID)
 			{
 				return true;
 			}
@@ -266,8 +248,8 @@ namespace Utility
 		int height = grid->HEIGHT;
 		int width = grid->WIDTH;
 
-		int startNodeID = (*path)[0].From.ID;
-		int endNodeID = (*path)[path->size() - 1].To.ID;
+		int startNodeID = (*path)[0].From;
+		int endNodeID = (*path)[path->size() - 1].To;
 
 		for (int i = 1; i <= height * width; i++)
 		{

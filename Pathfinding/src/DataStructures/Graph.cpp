@@ -9,7 +9,7 @@ Graph::Node::Point::Point(int x, int y)
 Graph::Node::Node(int id, Point position)
 	: ID(id), Position(position) {}
 
-Graph::Connection::Connection(Node from, Node to, float cost)
+Graph::Connection::Connection(int from, int to, float cost)
 	: From(from), To(to), Cost(cost) {}
 
 Graph::Graph() {}
@@ -41,7 +41,7 @@ void Graph::AddNode(Node node)
 
 void Graph::AddConnection(Connection connection)
 {
-	Node node = connection.From;
+	Node node = m_Nodes[connection.From];
 	if (node.ID < 0 || node.ID > m_ConnectionsPerNodeID.size() - 1)
 	{
 		std::cout << "From node does not exist in this graph!" << std::endl;
@@ -60,7 +60,7 @@ void Graph::Print()
 		for (int j = 0; j < m_ConnectionsPerNodeID[i].size(); j++)
 		{
 			Connection c = m_ConnectionsPerNodeID[i][j];
-			std::cout << "\t{" << c.To.ID << ", " << c.Cost << "}" << std::endl;
+			std::cout << "\t{" << m_Nodes[c.To].ID << ", " << c.Cost << "}" << std::endl;
 		}
 	}
 }

@@ -5,7 +5,7 @@
 
 #define NULL_POSITION Graph::Node::Point(INFINITY, INFINITY)
 #define NULL_NODE -1, NULL_POSITION
-#define NULL_CONNECTION(From) From, Graph::Node(NULL_NODE), INFINITY
+#define NULL_CONNECTION -1, -1, INFINITY
 class Graph
 {
 public:
@@ -27,11 +27,11 @@ public:
 
 	struct Connection
 	{
-		Node From;
-		Node To;
+		int From;
+		int To;
 		float Cost;
 
-		Connection(Node from, Node to, float cost);
+		Connection(int from, int to, float cost);
 	};
 
 public:
