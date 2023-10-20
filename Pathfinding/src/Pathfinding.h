@@ -10,6 +10,7 @@
 //Tools
 #include "Tools\Logger.h"
 #include "Tools\Profiling.h"
+#include "Tools\MemoryProfiling.h"
 
 //Utility
 #include "Utility\Utility.h"
