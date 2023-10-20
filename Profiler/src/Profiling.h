@@ -28,7 +28,7 @@ namespace Profiling
 		~AccumulatedTimer();
 		void Stop();
 	private:
-		std::chrono::time_point<std::chrono::high_resolution_clock> m_StartTimePoint;
+		int64_t m_start;
 		const char* m_functionName;
 		const char* m_functionSign;
 	};

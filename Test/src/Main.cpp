@@ -3,8 +3,8 @@
 #include "Pathfinding.h"
 #include <memory>
 
-#define GRID_HEIGHT 50
-#define GRID_WIDTH 50
+#define GRID_HEIGHT 1000
+#define GRID_WIDTH 1000
 
 int main()
 {

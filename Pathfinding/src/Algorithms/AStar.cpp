@@ -11,8 +11,8 @@ namespace AStar
 
 	float Estimate(Graph::Node current, Graph::Node end)
 	{
-		PROFILE();
-		PROFILE_MEMORY();
+		//PROFILE();
+		//PROFILE_MEMORY();
 		return (float)std::sqrt(std::pow(current.Position.X - end.Position.X, 2) + std::pow(current.Position.Y - end.Position.Y, 2));
 	}
 

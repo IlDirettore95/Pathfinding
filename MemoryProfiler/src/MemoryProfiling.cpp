@@ -118,9 +118,13 @@ namespace MemoryProfiling
 
 			AllocationMetrics globalData(s_closedFiles[k]);
 			std::unordered_map<std::string, int> allocatedMemory;
-			std::unordered_map<std::string, AllocationMetrics> globalMemoryTrackers;
+			std::unordered_map<int, std::string> globalMemoryFSign;
+			std::unordered_map<std::string, int> globalMemoryFSignIndexes;
+			std::unordered_map<int, AllocationMetrics> globalMemoryTrackers;
 			std::list<std::string> activeFunctions;
 			
+			int fIndex = 0;
+
 			while (std::getline(file, line))
 			{
 				std::vector <std::string> tokens;
@@ -147,13 +151,17 @@ namespace MemoryProfiling
 						std::string fSign = tokens[i];
 						i++;
 						std::string fName = tokens[i];
-						if (!globalMemoryTrackers.contains(fSign))
+						if (!globalMemoryFSignIndexes.contains(fSign))
 						{
-							globalMemoryTrackers[fSign] = AllocationMetrics(fName);
+							globalMemoryFSignIndexes[fSign] = fIndex;
+							globalMemoryFSign[fIndex] = fSign;
+							globalMemoryTrackers[fIndex] = AllocationMetrics(fName);
+							fIndex++;
 						}
 						else
 						{
-							globalMemoryTrackers[fSign].TotalAllocated = 0;
+							int index = globalMemoryFSignIndexes[fSign];
+							globalMemoryTrackers[index].TotalAllocated = 0;
 						}
 						activeFunctions.push_back(fSign);
 					}
@@ -163,7 +171,8 @@ namespace MemoryProfiling
 						std::string fSign = tokens[i];
 						i++;
 						std::string fName = tokens[i];
-						AllocationMetrics& data = globalMemoryTrackers[fSign];
+						int index = globalMemoryFSignIndexes[fSign];
+						AllocationMetrics& data = globalMemoryTrackers[index];
 						data.GlobalMaxUsage = data.MaxUsage > data.GlobalMaxUsage ? data.MaxUsage : data.GlobalMaxUsage;
 						activeFunctions.pop_back();
 					}
@@ -176,7 +185,8 @@ namespace MemoryProfiling
 						allocatedMemory[address] = count;
 						for (std::string fSign : activeFunctions)
 						{
-							globalMemoryTrackers[fSign].AddAllocation(count);
+							int index = globalMemoryFSignIndexes[fSign];
+							globalMemoryTrackers[index].AddAllocation(count);
 						}
 						globalData.AddAllocation(count);
 					}
@@ -198,18 +208,21 @@ namespace MemoryProfiling
 
 						for (std::string fSign : activeFunctions)
 						{
-							globalMemoryTrackers[fSign].TotalAllocated -= count;
+							int index = globalMemoryFSignIndexes[fSign];
+							globalMemoryTrackers[index].TotalAllocated -= count;
 						}
 						globalData.TotalAllocated -= count;
 					}
 				}
 			}
-			
-			for (const std::pair<std::string, AllocationMetrics> entry : globalMemoryTrackers)
+
+			for (int i = 0; i < fIndex; i++)
 			{
-				AllocationMetrics data = (AllocationMetrics)entry.second;
+				std::string name = globalMemoryFSign[i];
+				AllocationMetrics data = globalMemoryTrackers[i];
 				std::cout << data.FunctionName << "\n\tMax Usage: " << data.GlobalMaxUsage * 0.000001 << " Mbytes." << std::endl;
 			}
+		
 			std::cout << std::endl;
 			std::cout << "Global MaxUsage: " << globalData.MaxUsage *  0.000001 << " Mbytes." << std::endl;
 			std::cout << "Global Final Memory Leak: " << globalData.TotalAllocated * 0.000001 << " Mbytes." << std::endl;

@@ -9,6 +9,7 @@ namespace Profiling
 	namespace
 	{
 		std::unordered_map<const char*, ProfilingData> s_profilingDatabase;
+		int64_t lastStart = 0;
 	}
 
 	ProfilingData::ProfilingData()
@@ -47,9 +48,14 @@ namespace Profiling
 
 	AccumulatedTimer::AccumulatedTimer(const char* functionName, const char* functionSign)
 	{
-		m_StartTimePoint = std::chrono::high_resolution_clock::now();
+		m_start = std::chrono::time_point_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now()).time_since_epoch().count();
 		m_functionName = functionName;
 		m_functionSign = functionSign;
+
+		if (m_start == lastStart)
+			m_start += 1;
+
+		lastStart = m_start;
 	}
 
 	AccumulatedTimer::~AccumulatedTimer()
@@ -59,12 +65,9 @@ namespace Profiling
 
 	void AccumulatedTimer::Stop()
 	{
-		std::chrono::time_point<std::chrono::high_resolution_clock> endTimePoint = std::chrono::high_resolution_clock::now();
+		int64_t end = std::chrono::time_point_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now()).time_since_epoch().count();
 
-		int64_t start = std::chrono::time_point_cast<std::chrono::nanoseconds>(m_StartTimePoint).time_since_epoch().count();
-		int64_t end = std::chrono::time_point_cast<std::chrono::nanoseconds>(endTimePoint).time_since_epoch().count();
-
-		s_profilingDatabase[m_functionSign] = s_profilingDatabase.contains(m_functionSign) ? *(s_profilingDatabase[m_functionSign].AddTimeStamp(start, end)) : *(ProfilingData(m_functionName).AddTimeStamp(start, end));
+		s_profilingDatabase[m_functionSign] = s_profilingDatabase.contains(m_functionSign) ? *(s_profilingDatabase[m_functionSign].AddTimeStamp(m_start, end)) : *(ProfilingData(m_functionName).AddTimeStamp(m_start, end));
 	}
 
 	void PrintResults()
