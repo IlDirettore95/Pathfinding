@@ -34,7 +34,7 @@ int main()
 
 		Graph::Node start = graph->GetNodes()->at(0);
 		Graph::Node end = graph->GetNodes()->at((GRID_HEIGHT * GRID_WIDTH) - 1);
-		std::vector<Graph::Connection>* shortestPath = AStar::AStar(*graph, start, end);
+		std::shared_ptr<std::vector<Graph::Connection>> shortestPath = AStar::AStar(graph, start, end);
 		//Utility::PrintPath(&grid, graph, shortestPath);
 	}
 	PRINT_PROFILING_RESULTS();

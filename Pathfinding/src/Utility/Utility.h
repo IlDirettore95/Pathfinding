@@ -21,5 +21,7 @@ namespace Utility
 
 	std::shared_ptr<Graph> GridToGraph(Grid* grid);
 
-	void PrintPath(Grid* grid, std::shared_ptr<Graph> graph, std::vector<Graph::Connection>* path);
+	bool Contains(std::shared_ptr<std::vector<Graph::Connection>> list, int nodeID);
+
+	void PrintPath(Grid* grid, std::shared_ptr<Graph> graph, std::shared_ptr<std::vector<Graph::Connection>> path);
 }

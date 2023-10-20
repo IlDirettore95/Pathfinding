@@ -248,7 +248,7 @@ namespace Utility
 		return graph;
 	}
 
-	bool Contains(std::vector<Graph::Connection>* list, int nodeID)
+	bool Contains(std::shared_ptr<std::vector<Graph::Connection>> list, int nodeID)
 	{
 		for (int i = 0; i < list->size(); i++)
 		{
@@ -261,7 +261,7 @@ namespace Utility
 		return false;
 	}
 
-	void PrintPath(Grid* grid, std::shared_ptr<Graph> graph, std::vector<Graph::Connection>* path)
+	void PrintPath(Grid* grid, std::shared_ptr<Graph> graph, std::shared_ptr<std::vector<Graph::Connection>> path)
 	{
 		int height = grid->HEIGHT;
 		int width = grid->WIDTH;

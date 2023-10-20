@@ -31,12 +31,15 @@ namespace AStar
 		list.push_back(connection);
 	}
 
-	std::vector<Graph::Connection>* AStar(Graph& graph, Graph::Node start, Graph::Node end)
+	std::shared_ptr<std::vector<Graph::Connection>> AStar(std::shared_ptr<Graph> graph, Graph::Node start, Graph::Node end)
 	{
-		std::unique_ptr<NodeRecord[]> NodeRecordArray = std::make_unique<NodeRecord[]>(graph.GetNodes()->size());
-		for (int i = 0; i < graph.GetNodes()->size(); i++)
+		PROFILE();
+		PROFILE_MEMORY();
+
+		std::unique_ptr<NodeRecord[]> NodeRecordArray = std::make_unique<NodeRecord[]>(graph->GetNodes()->size());
+		for (int i = 0; i < graph->GetNodes()->size(); i++)
 		{
-			NodeRecordArray[i].Node = graph.GetNodes()->at(i);
+			NodeRecordArray[i].Node = graph->GetNodes()->at(i);
 			NodeRecordArray[i].Connection = Graph::Connection(NULL_CONNECTION(Graph::Node(NULL_NODE)));
 			NodeRecordArray[i].ParentNode = nullptr;
 			NodeRecordArray[i].CostSoFar = 0;
@@ -44,8 +47,6 @@ namespace AStar
 			NodeRecordArray[i].State = NodeRecord::State::UNVISITED;
 		}
 
-		PROFILE();
-		PROFILE_MEMORY();
 
 		NodeRecord* startRecord = &NodeRecordArray[start.ID];
 		startRecord->State = NodeRecord::State::OPEN;
@@ -65,7 +66,7 @@ namespace AStar
 			if (current->Node.ID == end.ID)
 				break;
 
-			std::vector<Graph::Connection>* connections = graph.GetConnections((*current).Node);
+			std::vector<Graph::Connection>* connections = graph->GetConnections((*current).Node);
 
 			for (Graph::Connection connection : *connections)
 			{
@@ -104,7 +105,8 @@ namespace AStar
 		if (current->Node.ID != end.ID)
 			return nullptr;
 
-		std::vector<Graph::Connection>* path = new std::vector<Graph::Connection>;
+		std::shared_ptr<std::vector<Graph::Connection>> path = std::make_shared<std::vector<Graph::Connection>>();
+		//std::vector<Graph::Connection>* path = new std::vector<Graph::Connection>;
 
 		while (current->Node.ID != start.ID)
 		{
