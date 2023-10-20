@@ -1,6 +1,7 @@
 #include <cmath>
 #include "AStar.h"
 #include "..\Tools\Profiling.h"
+#include "..\Tools\MemoryProfiling.h"
 #include "..\Tools\Logger.h"
 
 namespace AStar
@@ -13,13 +14,13 @@ namespace AStar
 
 	float Estimate(Graph::Node current, Graph::Node end)
 	{
-		START_PROFILE();
+		//PROFILE();
 		return (float)std::sqrt(std::pow(current.Position.X - end.Position.X, 2) + std::pow(current.Position.Y - end.Position.Y, 2));
 	}
 
 	void FindSmallestElement(std::vector<NodeRecord*>& list, NodeRecord** smallest)
 	{
-		START_PROFILE();
+		//PROFILE();
 		*smallest = list[0];
 
 		for (int i = 1; i < list.size(); i++)
@@ -50,13 +51,13 @@ namespace AStar
 
 	void Erase(std::vector<NodeRecord*>& list, int index)
 	{
-		START_PROFILE();
+		//PROFILE();
 		list.erase(list.begin() + index);
 	}
 
 	void Erase(std::vector<NodeRecord*>& list, NodeRecord* current)
 	{		
-		START_PROFILE();
+		//PROFILE();
 		for (int i = 0; i < list.size(); i++)
 		{
 			if (list[i]->Node.ID == current->Node.ID)
@@ -69,7 +70,7 @@ namespace AStar
 
 	bool Contains(std::vector<NodeRecord*>& list, Graph::Node& node)
 	{
-		START_PROFILE();
+		//PROFILE();
 		for (int i = 0; i < list.size(); i++)
 		{
 			if (list[i]->Node.ID == node.ID)
@@ -83,7 +84,7 @@ namespace AStar
 
 	bool ContainsClosed(std::vector<NodeRecord*>& list, Graph::Node& node, NodeRecord** nodeRecord, int* nodeIndex)
 	{
-		START_PROFILE();
+		//PROFILE();
 		for (int i = 0; i < list.size(); i++)
 		{
 			if (list[i]->Node.ID == node.ID)
@@ -98,7 +99,7 @@ namespace AStar
 
 	bool ContainsOpen(std::vector<NodeRecord*>& list, Graph::Node& node, NodeRecord** nodeRecord, int* nodeIndex)
 	{
-		START_PROFILE();
+		//PROFILE();
 		for (int i = 0; i < list.size(); i++)
 		{
 			if (list[i]->Node.ID == node.ID)
@@ -113,8 +114,11 @@ namespace AStar
 
 	std::vector<Graph::Connection>* AStar(Graph& graph, Graph::Node start, Graph::Node end)
 	{
-		START_PROFILE();
-		NodeRecord* startRecord = new NodeRecord(start, Graph::Connection(NULL_CONNECTION(start)), nullptr, 0, Estimate(start, end));
+		PROFILE_MEMORY();
+		PROFILE();
+
+		NodeRecord* startRecord = new NodeRecord;
+		*startRecord = NodeRecord(start, Graph::Connection(NULL_CONNECTION(start)), nullptr, 0, Estimate(start, end));
 
 		std::vector<NodeRecord*> open;
 		Add(open, startRecord);
@@ -192,7 +196,6 @@ namespace AStar
 
 		DEBUG("A_STAR (Fill %): ");
 		DEBUG((open.size() + closed.size()) / (float)graph.GetNodes()->size());
-
 
 		return path;
 	}

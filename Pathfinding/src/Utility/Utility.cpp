@@ -1,4 +1,5 @@
 ﻿#include "Utility.h"
+#include "..\Tools\MemoryProfiling.h"
 #include "..\Tools\Profiling.h"
 
 namespace Utility
@@ -45,13 +46,15 @@ namespace Utility
 
 	Graph* GridToGraph(Grid* grid)
 	{	
-		START_PROFILE();
-		Graph* graph = new Graph;
-
+		PROFILE_MEMORY();
+		PROFILE();
 
 		const int height = grid->HEIGHT;
 		const int width = grid->WIDTH;
 
+		Graph* graph = new Graph((height * width), (height * width) * 8);
+		//Graph* graph = new Graph;
+		
 		for (int i = 0; i < height; i++)
 		{
 			for (int j = 0; j < width; j++)
@@ -261,8 +264,6 @@ namespace Utility
 
 	void PrintPath(Grid* grid, Graph* graph, std::vector<Graph::Connection>* path)
 	{
-		START_PROFILE();
-
 		int height = grid->HEIGHT;
 		int width = grid->WIDTH;
 

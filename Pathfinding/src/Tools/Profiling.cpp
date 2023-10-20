@@ -1,10 +1,14 @@
 #include "Profiling.h"
+#include <memory>
+#include <unordered_map>
+
+#if defined GMDG_PROFILE
 
 namespace Profiling
 {
 	namespace
 	{
-		std::unordered_map<const char*, ProfilingData> ProfilingDatabase;
+		std::unordered_map<const char*, ProfilingData> s_profilingDatabase;
 	}
 
 	ProfilingData::ProfilingData()
@@ -60,16 +64,14 @@ namespace Profiling
 		int64_t start = std::chrono::time_point_cast<std::chrono::nanoseconds>(m_StartTimePoint).time_since_epoch().count();
 		int64_t end = std::chrono::time_point_cast<std::chrono::nanoseconds>(endTimePoint).time_since_epoch().count();
 
-		ProfilingDatabase[m_functionSign] = ProfilingDatabase.contains(m_functionSign) ? *(ProfilingDatabase[m_functionSign].AddTimeStamp(start, end)) : *(ProfilingData(m_functionName).AddTimeStamp(start, end));
-
-		//std::cout << m_functionName << " " << start << std::endl;
+		s_profilingDatabase[m_functionSign] = s_profilingDatabase.contains(m_functionSign) ? *(s_profilingDatabase[m_functionSign].AddTimeStamp(start, end)) : *(ProfilingData(m_functionName).AddTimeStamp(start, end));
 	}
 
-	void PrintTimeStamps()
+	void PrintResults()
 	{
 		std::vector<ProfilingData> database;
 
-		for (const std::pair<const char*, ProfilingData> entry : ProfilingDatabase)
+		for (const std::pair<const char*, ProfilingData> entry : s_profilingDatabase)
 		{
 			database.push_back(entry.second);
 		}
@@ -91,7 +93,8 @@ namespace Profiling
 
 		ProfilingData data;
 		
-		char* nTabs = new char[size];
+		// Tabs
+		std::unique_ptr<char[]> nTabs = std::make_unique<char[]>(size);
 		for (int i = 0; i < size; i++)
 		{
 			nTabs[i] = 0;
@@ -114,12 +117,12 @@ namespace Profiling
 				nTabs[i] = 0;
 		}
 
+		// Duration & Percentage
+		std::unique_ptr<double[]> durations = std::make_unique<double[]>(size);
+		std::unique_ptr<double[]> percentages = std::make_unique<double[]>(size);
 		for (int i = 0; i < size; i++)
 		{
 			data = database[i];
-			
-			const char* name = data.GetFunctionName();
-			
 			double duration = 0;
 			for (int j = 0; j < data.GetStarts()->size(); j++)
 			{
@@ -127,7 +130,29 @@ namespace Profiling
 				int64_t end = data.GetEnds()->at(j);
 				duration += (end - start) * 0.000001;
 			}
+			durations[i] = duration;
+
+			percentages[i] = 100;
+			if (nTabs[i] != 0)
+			{
+				for (int j = i - 1; j >= 0; j--)
+				{
+					if (nTabs[j] != nTabs[i] - 1) continue;
+
+					percentages[i] = duration / durations[j] * 100;
+					break;
+				}
+			}
+		}
+
+		// Print Time 
+		for (int i = 0; i < size; i++)
+		{
+			data = database[i];
 			
+			const char* name = data.GetFunctionName();		
+			double duration = durations[i];
+			double percentage = percentages[i];		
 			size_t callCount = data.GetCallCount();
 
 			// Tabs
@@ -137,7 +162,9 @@ namespace Profiling
 				tabs.append("\t");
 			}
 
-			std::cout << tabs << name << "\t(took " << duration << "ms)   " << "\t(called " << callCount << " times)" << std::endl;
-		}
+			std::cout << tabs << name << "\ttook "  << duration << "ms (" << percentage << "%)" << "\tcall count (" << callCount << ")" << std::endl;
+		}	
 	}
 }
+
+#endif

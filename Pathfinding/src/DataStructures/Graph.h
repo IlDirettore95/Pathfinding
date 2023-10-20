@@ -11,20 +11,17 @@ class Graph
 public:
 	struct Node
 	{
-
 		struct Point
 		{
 			float X;
 			float Y;
 
 			Point(float x, float y);
-
 			Point(int x, int y);
 		};
 
 		int ID;
 		Point Position;
-
 		Node(int id, Point position);
 	};
 
@@ -37,18 +34,15 @@ public:
 		Connection(Node from, Node to, float cost);
 	};
 
+public:
+	Graph();
+	Graph(int numNodes, int numConnections);
+	std::vector<Node>* GetNodes();
+	std::vector<Connection>* GetConnections(Node node);
+	void AddNode(Node node);
+	void AddConnection(Connection connection);
+	void Print();
 private:
 	std::vector<Node> m_Nodes;
 	std::vector<std::vector<Connection>> m_ConnectionsPerNodeID;
-
-public:
-	std::vector<Node>* GetNodes();
-
-	std::vector<Connection>* GetConnections(Node node);
-
-	void AddNode(Node node);
-
-	void AddConnection(Connection connection);
-
-	void Print();
 };

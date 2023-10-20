@@ -12,6 +12,14 @@ Graph::Node::Node(int id, Point position)
 Graph::Connection::Connection(Node from, Node to, float cost)
 	: From(from), To(to), Cost(cost) {}
 
+Graph::Graph() {}
+
+Graph::Graph(int numNodes, int numConnections)
+{
+	m_Nodes.reserve(numNodes);
+	m_ConnectionsPerNodeID.reserve(numNodes);
+}
+
 std::vector<Graph::Node>* Graph::GetNodes()
 {
 	return &m_Nodes;
@@ -27,6 +35,8 @@ void Graph::AddNode(Node node)
 	m_Nodes.push_back(node);
 	std::vector<Connection> vector;
 	m_ConnectionsPerNodeID.push_back(vector);
+	m_ConnectionsPerNodeID[node.ID].reserve(8);
+	
 }
 
 void Graph::AddConnection(Connection connection)
