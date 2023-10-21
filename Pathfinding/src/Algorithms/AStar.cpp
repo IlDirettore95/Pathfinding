@@ -33,8 +33,6 @@ namespace AStar
 
 	std::shared_ptr<std::vector<Graph::Connection>> AStar(std::shared_ptr<Graph> graph, Graph::Node start, Graph::Node end)
 	{
-		PROFILE();
-		PROFILE_MEMORY();
 
 		std::unique_ptr<NodeRecord[]> NodeRecordArray = std::make_unique<NodeRecord[]>(graph->GetNodes()->size());
 		for (int i = 0; i < graph->GetNodes()->size(); i++)
@@ -47,6 +45,8 @@ namespace AStar
 			NodeRecordArray[i].State = NodeRecord::State::UNVISITED;
 		}
 
+		PROFILE();
+		PROFILE_MEMORY();
 
 		NodeRecord* startRecord = &NodeRecordArray[start.ID];
 		startRecord->State = NodeRecord::State::OPEN;
