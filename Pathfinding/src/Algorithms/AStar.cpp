@@ -33,7 +33,8 @@ namespace AStar
 
 	std::shared_ptr<std::vector<Graph::Connection>> AStar(std::shared_ptr<Graph> graph, Graph::Node start, Graph::Node end)
 	{
-
+		
+		// Preallocates the memory for the array of node records and initialize it
 		std::unique_ptr<NodeRecord[]> NodeRecordArray = std::make_unique<NodeRecord[]>(graph->GetNodes()->size());
 		for (int i = 0; i < graph->GetNodes()->size(); i++)
 		{
@@ -51,6 +52,8 @@ namespace AStar
 		NodeRecord* startRecord = &NodeRecordArray[start.ID];
 		startRecord->State = NodeRecord::State::OPEN;
 		startRecord->EstimatedTotalCost = Estimate(start, end);
+		
+		// Defines a lambda function for sorting the priority queue
 		auto cmp = [] (NodeRecord* left, NodeRecord* right) { return (left->EstimatedTotalCost) > (right->EstimatedTotalCost); };
 		std::priority_queue<NodeRecord*, std::vector<NodeRecord*>, decltype(cmp)> open(cmp);
 
@@ -60,9 +63,11 @@ namespace AStar
 
 		while (open.size() > 0)
 		{
+			// Take the best node from the open list
 			current = open.top();
 			open.pop();
 
+			// This will allow the algorithm to return suboptimal goals 
 			if (current->Node.ID == end.ID)
 				break;
 
@@ -80,6 +85,8 @@ namespace AStar
 				{
 				case NodeRecord::State::CLOSED:
 				case NodeRecord::State::OPEN:
+
+					// If a better path to END node has already been found, this connection is skipped
 					if (endNodeRecord->CostSoFar <= endNodeCost)
 						continue;
 
@@ -102,11 +109,11 @@ namespace AStar
 			current->State = NodeRecord::State::CLOSED;
 		}
 
+		// If the entire graph was searched and the END node has not been found, the path does not exist
 		if (current->Node.ID != end.ID)
 			return nullptr;
 
 		std::shared_ptr<std::vector<Graph::Connection>> path = std::make_shared<std::vector<Graph::Connection>>();
-		//std::vector<Graph::Connection>* path = new std::vector<Graph::Connection>;
 
 		while (current->Node.ID != start.ID)
 		{
