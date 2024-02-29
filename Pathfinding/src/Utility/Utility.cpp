@@ -1,6 +1,7 @@
 ﻿#include "Utility.h"
 #include "..\Core.h"
 #include <memory>
+#include <Windows.h>
 
 namespace Utility
 {
@@ -46,8 +47,8 @@ namespace Utility
 
 	std::shared_ptr<Graph> GridToGraph(Grid* grid)
 	{
-		PROFILE();
-		PROFILE_MEMORY();
+		//PROFILE();
+		//PROFILE_MEMORY();
 	
 		std::shared_ptr<Graph> graph = std::make_shared<Graph>();
 
@@ -232,6 +233,8 @@ namespace Utility
 
 	bool Contains(std::shared_ptr<std::vector<Graph::Connection>> list, int nodeID)
 	{
+		if (!list) return false;
+
 		for (int i = 0; i < list->size(); i++)
 		{
 			if ((*list)[i].From == nodeID || (*list)[i].To == nodeID)
@@ -243,48 +246,72 @@ namespace Utility
 		return false;
 	}
 
-	void PrintPath(Grid* grid, std::shared_ptr<Graph> graph, std::shared_ptr<std::vector<Graph::Connection>> path)
+	void PrintPath(Grid* grid, std::shared_ptr<Graph> graph, std::shared_ptr<std::vector<Graph::Connection>> path, Graph::Node& startNode, Graph::Node& endNode)
 	{
 		int height = grid->HEIGHT;
 		int width = grid->WIDTH;
 
-		int startNodeID = (*path)[0].From;
-		int endNodeID = (*path)[path->size() - 1].To;
+		int startNodeID = startNode.ID;
+		int endNodeID = endNode.ID;
+
+		HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
 
 		for (int i = 1; i <= height * width; i++)
 		{
+			SetConsoleTextAttribute(h, 8);
 			std::cout << "  ";
 
 			if (Contains(path, i - 1))
 			{
 				if (i - 1 == startNodeID)
 				{
+					SetConsoleTextAttribute(h, 14);
 					std::cout << 'S';
 				}
 				else if (i - 1 == endNodeID)
-				{
+				{	
+					SetConsoleTextAttribute(h, 14);
 					std::cout << 'E';
 				}
 				else
 				{
+					SetConsoleTextAttribute(h, 10);
 					std::cout << '*';
 				}
 			}
 			else
 			{
-				char element = grid->GetElement(Grid::Point((i - 1) / width, (i - 1) % height));
-				switch (element)
+				if (i - 1 == startNodeID)
 				{
-				case Grid::CELL_TYPE::PASSABLE:
-					std::cout << '.';
-					break;
-				case Grid::CELL_TYPE::NON_PASSABLE:
-					std::cout << 'X';
-					break;
-				default:
-					break;
+					SetConsoleTextAttribute(h, 14);
+					std::cout << 'S';
 				}
+				else if (i - 1 == endNodeID)
+				{
+					SetConsoleTextAttribute(h, 14);
+					std::cout << 'E';
+				}
+				else
+				{
+					char element = grid->GetElement(Grid::Point((i - 1) / width, (i - 1) % height));
+					switch (element)
+					{
+					case Grid::CELL_TYPE::PASSABLE:
+						std::cout << '.';
+						break;
+					case Grid::CELL_TYPE::NON_PASSABLE:
+						SetConsoleTextAttribute(h, 12);
+						std::cout << 'X';
+						break;
+					default:
+						break;
+					}
+				}
+
 			}
+
+			SetConsoleTextAttribute(h, 15);
+
 			if (i % width == 0)
 				std::cout << std::endl;
 		}

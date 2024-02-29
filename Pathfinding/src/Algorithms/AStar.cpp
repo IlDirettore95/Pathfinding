@@ -45,8 +45,8 @@ namespace AStar
 			NodeRecordArray[i].State = NodeRecord::State::UNVISITED;
 		}
 
-		PROFILE();
-		PROFILE_MEMORY();
+		//PROFILE();
+		//PROFILE_MEMORY();
 
 		NodeRecord* startRecord = &NodeRecordArray[start.ID];
 		startRecord->State = NodeRecord::State::OPEN;

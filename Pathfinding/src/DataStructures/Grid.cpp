@@ -5,8 +5,8 @@
 Grid::Grid(const int height, const int width)
 	: m_grid(nullptr), HEIGHT(height), WIDTH(width)
 {
-	PROFILE_MEMORY();
-	PROFILE();
+	//PROFILE_MEMORY();
+	//PROFILE();
 	m_grid = new char[HEIGHT * WIDTH];
 
 	for (int i = 0; i < HEIGHT * WIDTH; i++)
