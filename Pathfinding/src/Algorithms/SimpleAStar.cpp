@@ -187,8 +187,8 @@ namespace SimpleAStar
 
 		Reverse(*path);
 
-		DEBUG("A_STAR (Fill %): ");
-		DEBUG((open.size() + closed.size()) / (float)graph.GetNodes()->size());
+		//DEBUG("A_STAR (Fill %): ");
+		//DEBUG((open.size() + closed.size()) / (float)graph.GetNodes()->size());
 
 
 		return path;

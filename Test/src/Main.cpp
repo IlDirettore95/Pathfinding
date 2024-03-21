@@ -1,11 +1,8 @@
-#include <Windows.h>
 #include <iostream>
 #include <vector>
 #include "Pathfinding.h"
 #include <memory>
 #include <cmath>
-
-#undef max()
 
 // Grid size macro
 #define GRID_HEIGHT 2000
@@ -43,31 +40,6 @@ bool ChoseAlgorithm()
 
 int main()
 {
-	//while (true)
-	//{
-	//	system("cls");
-	//	if (ChoseAlgorithm()) break;
-	//}
-
-	//switch (chosenAlgorithm)
-	//{
-	//	case AlgorithmTypes::ESimpleAStar:
-	//	{
-	//		std::cout << "Running Pathfinding version= " << "\"" << VERSION_1 << "\"" << std::endl << std::endl;
-	//		break;
-	//	}
-	//	case AlgorithmTypes::ENodeArrayAStar:
-	//	{
-	//		std::cout << "Running Pathfinding version= " << "\"" << VERSION_2 << "\"" << std::endl << std::endl;
-	//		break;
-	//	}
-	//	case AlgorithmTypes::EPriorityQueueAStar:
-	//	{
-	//		std::cout << "Running Pathfinding version= " << "\"" << VERSION_3 << "\"" << std::endl << std::endl;
-	//		break;
-	//	}
-	//}
-
 	std::cout << "Running Pathfinding on a " << GRID_HEIGHT << " x " << GRID_WIDTH << " grid" << std::endl;
 
 	for (int algType = AlgorithmTypes::ESimpleAStar; algType <= AlgorithmTypes::EPriorityQueueAStar; algType++)
