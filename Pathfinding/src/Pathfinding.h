@@ -8,6 +8,8 @@
 #include "DataStructures\Graph.h"
 
 //Algorithms
+#include "Algorithms\SimpleAStar.h"
+#include "Algorithms\NodeArrayAStar.h"
 #include "Algorithms\AStar.h"
 
 //Tools

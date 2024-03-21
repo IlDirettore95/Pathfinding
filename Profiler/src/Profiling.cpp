@@ -167,6 +167,10 @@ namespace Profiling
 
 			std::cout << tabs << name << "\ttook "  << duration << "ms (" << percentage << "%)" << "\tcall count (" << callCount << ")" << std::endl;
 		}	
+
+		//Reset Profiling
+		s_profilingDatabase.clear();
+		lastStart = 0;
 	}
 }
 

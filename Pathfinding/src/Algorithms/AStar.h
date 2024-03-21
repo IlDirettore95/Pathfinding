@@ -3,7 +3,7 @@
 #include "..\DataStructures\Graph.h"
 #include <queue>
 
-namespace AStar
+namespace PriorityQueueAStar
 {
 	// Struct used to hold runtime information about graph's nodes
 	struct NodeRecord

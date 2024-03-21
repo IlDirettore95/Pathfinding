@@ -35,6 +35,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Algorithms\NodeArrayAStar.cpp" />
+    <ClCompile Include="src\Algorithms\SimpleAStar.cpp" />
     <ClCompile Include="src\DataStructures\Graph.cpp" />
     <ClCompile Include="src\DataStructures\Grid.cpp" />
     <ClCompile Include="src\Tools\Logger.cpp" />
@@ -42,6 +44,8 @@
     <ClCompile Include="src\Utility\Utility.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Algorithms\NodeArrayAStar.h" />
+    <ClInclude Include="src\Algorithms\SimpleAStar.h" />
     <ClInclude Include="src\Core.h" />
     <ClInclude Include="src\DataStructures\Graph.h" />
     <ClInclude Include="src\DataStructures\Grid.h" />

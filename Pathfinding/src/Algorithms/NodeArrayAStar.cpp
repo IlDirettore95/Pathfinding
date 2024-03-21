@@ -1,19 +1,30 @@
 #include <cmath>
-#include "AStar.h"
+#include "NodeArrayAStar.h"
 #include "..\Core.h"
 #include "..\Tools\Logger.h"
 #include <memory>
 
-namespace PriorityQueueAStar
+namespace NodeArrayAStar
 {
 	NodeRecord::NodeRecord()
-		: Node(NULL_NODE), Connection(NULL_CONNECTION), ParentNode(nullptr), CostSoFar(INFINITY), EstimatedTotalCost(INFINITY), State(NodeRecord::State::UNVISITED) {}
+		: Node(NULL_NODE), Connection(NULL_CONNECTION), ParentNode(nullptr), CostSoFar(INFINITY), EstimatedTotalCost(INFINITY) {}
+
+	NodeRecord::NodeRecord(Graph::Node node, Graph::Connection connection, NodeRecord* parentNode, float costSoFar, float estimatedTotalCost)
+		: Node(node), Connection(connection), ParentNode(parentNode), CostSoFar(costSoFar), EstimatedTotalCost(estimatedTotalCost) {}
 
 	float Estimate(Graph::Node current, Graph::Node end)
 	{
-		//PROFILE();
-		//PROFILE_MEMORY();
 		return (float)std::sqrt(std::pow(current.Position.X - end.Position.X, 2) + std::pow(current.Position.Y - end.Position.Y, 2));
+	}
+
+	void FindSmallestElement(std::vector<NodeRecord*>& list, NodeRecord** smallest)
+	{
+		*smallest = list[0];
+
+		for (int i = 1; i < list.size(); i++)
+		{
+			*smallest = list[i]->EstimatedTotalCost < (*smallest)->EstimatedTotalCost ? list[i] : *smallest;
+		}
 	}
 
 	void Reverse(std::vector<Graph::Connection>& list)
@@ -31,10 +42,25 @@ namespace PriorityQueueAStar
 		list.push_back(connection);
 	}
 
+	void Add(std::vector<NodeRecord*>& list, NodeRecord* node)
+	{
+		list.push_back(node);
+	}
+
+	void Erase(std::vector<NodeRecord*>& list, NodeRecord* current)
+	{
+		for (int i = 0; i < list.size(); i++)
+		{
+			if (list[i]->Node.ID == current->Node.ID)
+			{
+				list.erase(list.begin() + i);
+				break;
+			}
+		}
+	}
+
 	std::shared_ptr<std::vector<Graph::Connection>> AStar(std::shared_ptr<Graph> graph, Graph::Node start, Graph::Node end)
 	{
-		
-		// Preallocates the memory for the array of node records and initialize it
 		std::unique_ptr<NodeRecord[]> NodeRecordArray = std::make_unique<NodeRecord[]>(graph->GetNodes()->size());
 		for (int i = 0; i < graph->GetNodes()->size(); i++)
 		{
@@ -51,23 +77,15 @@ namespace PriorityQueueAStar
 
 		NodeRecord* startRecord = &NodeRecordArray[start.ID];
 		startRecord->State = NodeRecord::State::OPEN;
-		startRecord->EstimatedTotalCost = Estimate(start, end);
-		
-		// Defines a lambda function for sorting the priority queue
-		auto cmp = [] (NodeRecord* left, NodeRecord* right) { return (left->EstimatedTotalCost) > (right->EstimatedTotalCost); };
-		std::priority_queue<NodeRecord*, std::vector<NodeRecord*>, decltype(cmp)> open(cmp);
+		std::vector<NodeRecord*> open;
+		Add(open, startRecord);
 
 		NodeRecord* current = startRecord;
-		
-		open.push(current);
 
 		while (open.size() > 0)
 		{
-			// Take the best node from the open list
-			current = open.top();
-			open.pop();
+			FindSmallestElement(open, &current);
 
-			// This will allow the algorithm to return suboptimal goals 
 			if (current->Node.ID == end.ID)
 				break;
 
@@ -85,8 +103,6 @@ namespace PriorityQueueAStar
 				{
 				case NodeRecord::State::CLOSED:
 				case NodeRecord::State::OPEN:
-
-					// If a better path to END node has already been found, this connection is skipped
 					if (endNodeRecord->CostSoFar <= endNodeCost)
 						continue;
 
@@ -103,13 +119,14 @@ namespace PriorityQueueAStar
 				if (endNodeRecord->State != NodeRecord::State::OPEN)
 				{
 					endNodeRecord->State = NodeRecord::State::OPEN;
-					open.push(endNodeRecord);
+					Add(open, endNodeRecord);
 				}
 			}
+
+			Erase(open, current);
 			current->State = NodeRecord::State::CLOSED;
 		}
 
-		// If the entire graph was searched and the END node has not been found, the path does not exist
 		if (current->Node.ID != end.ID)
 			return nullptr;
 
